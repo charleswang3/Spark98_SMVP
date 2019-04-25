@@ -1,0 +1,69 @@
+1. Global mesh summary (sf5.1.pack).
+   Nodes    :     30169  Edges    :    190377  Elements: 151173
+   Interface:         0  Interface:         0
+   Interior :     30169  Interior :    190377
+
+   Dimensions: 3  Subdomains: 1  Nodes/elem: 4
+
+1.1. Node degrees.
+       Range          Count          Min: 4 Avg: 12.6 Max: 29 Tot: 380754
+       3 - 4        : 17
+       5 - 8        : 2284
+       9 - 16       : 24638
+      17 - 32       : 3230
+       Total          30169     
+
+1.2. Nodes per subdomain.
+       Range          Count          Min: 30169 Avg: 30169.0 Max: 30169 Tot: 30169
+   16385 - 32768    : 1
+       Total          1         
+
+1.3. Interface nodes per subdomain.
+       Range          Count          Min: 0 Avg: 0.0 Max: 0 Tot: 0
+       Total          0         
+
+1.4. Elements per subdomain.
+       Range          Count          Min: 151173 Avg: 151173.0 Max: 151173 Tot: 151173
+  131073 - 262144   : 1
+       Total          1         
+
+1.5. Edges per subdomain.
+       Range          Count          Min: 190377 Avg: 190377.0 Max: 190377 Tot: 190377
+  131073 - 262144   : 1
+       Total          1         
+
+1.6. Interface edges per subdomain.
+       Range          Count          Min: 0 Avg: 0.0 Max: 0 Tot: 0
+       Total          0         
+
+2. Global matrix summary.
+   Nonzero matrix entries (symmetric): 220546
+   Nonzero matrix entries (nonsymmetric): 410923
+
+   (Note: Each matrix entry consists of dof*dof words, where dof
+    is the degrees of freedom in the simulation.)
+
+2.1. Nonzero matrix entries per subdomain (symmetric).
+       Range          Count          Min: 220546 Avg: 220546.0 Max: 220546 Tot: 220546
+  131073 - 262144   : 1
+       Total          1         
+
+2.2. Nonzero matrix entries per subdomain (nonsymmetric).
+       Range          Count          Min: 410923 Avg: 410923.0 Max: 410923 Tot: 410923
+  262145 - 524288   : 1
+       Total          1         
+
+2.3. Fewest average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 5 Avg: 13.6 Max: 30 Tot: 410923
+       5 - 8        : 974
+       9 - 16       : 24173
+      17 - 32       : 5022
+       Total          30169     
+
+2.4. Most average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 5 Avg: 13.6 Max: 30 Tot: 410923
+       5 - 8        : 974
+       9 - 16       : 24173
+      17 - 32       : 5022
+       Total          30169     
+

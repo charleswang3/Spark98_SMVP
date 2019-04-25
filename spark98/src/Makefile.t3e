@@ -1,0 +1,19 @@
+#
+# CRAY T3E using MPI message passing and 450 MHz nodes
+#
+CC = cc
+OPTIONS = -O2 
+
+all: smv mmv
+
+smv: smv.c
+	$(CC) $(OPTIONS) -o smv smv.c
+	/bin/setlabel -l H450 smv
+
+mmv: mmv.c
+	$(CC) $(OPTIONS) -o mmv mmv.c -lmpi
+	/bin/setlabel -l H450 mmv
+
+clean:
+	-rm -f smv mmv *.o *~
+

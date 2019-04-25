@@ -1,0 +1,115 @@
+1. Global mesh summary (sf5.4.pack).
+   Nodes    :     30169  Edges    :    190377  Elements: 151173
+   Interface:      1686  Interface:      4714
+   Interior :     28483  Interior :    185663
+
+   Dimensions: 3  Subdomains: 4  Nodes/elem: 4
+
+1.1. Node degrees.
+       Range          Count          Min: 4 Avg: 12.6 Max: 29 Tot: 380754
+       3 - 4        : 17
+       5 - 8        : 2284
+       9 - 16       : 24638
+      17 - 32       : 3230
+       Total          30169     
+
+1.2. Nodes per subdomain.
+       Range          Count          Min: 7828 Avg: 7968.0 Max: 8207 Tot: 31872
+    4097 - 8192     : 3
+    8193 - 16384    : 1
+       Total          4         
+
+1.3. Interface nodes per subdomain.
+       Range          Count          Min: 432 Avg: 847.2 Max: 1274 Tot: 3389
+     257 - 512      : 1
+     513 - 1024     : 2
+    1025 - 2048     : 1
+       Total          4         
+
+1.4. Elements per subdomain.
+       Range          Count          Min: 37793 Avg: 37793.3 Max: 37794 Tot: 151173
+   32769 - 65536    : 4
+       Total          4         
+
+1.5. Edges per subdomain.
+       Range          Count          Min: 48378 Avg: 48776.8 Max: 49464 Tot: 195107
+   32769 - 65536    : 4
+       Total          4         
+
+1.6. Interface edges per subdomain.
+       Range          Count          Min: 1193 Avg: 2361.0 Max: 3537 Tot: 9444
+    1025 - 2048     : 1
+    2049 - 4096     : 3
+       Total          4         
+
+2. Global matrix summary.
+   Nonzero matrix entries (symmetric): 220546
+   Nonzero matrix entries (nonsymmetric): 410923
+
+   (Note: Each matrix entry consists of dof*dof words, where dof
+    is the degrees of freedom in the simulation.)
+
+2.1. Nonzero matrix entries per subdomain (symmetric).
+       Range          Count          Min: 56206 Avg: 56744.8 Max: 57671 Tot: 226979
+   32769 - 65536    : 4
+       Total          4         
+
+2.2. Nonzero matrix entries per subdomain (nonsymmetric).
+       Range          Count          Min: 104584 Avg: 105521.5 Max: 107135 Tot: 422086
+   65537 - 131072   : 4
+       Total          4         
+
+2.3. Fewest average entries per row (non-symmetric) [subdomain 3].
+       Range          Count          Min: 4 Avg: 13.1 Max: 28 Tot: 107135
+       3 - 4        : 46
+       5 - 8        : 607
+       9 - 16       : 6388
+      17 - 32       : 1166
+       Total          8207      
+
+2.4. Most average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 4 Avg: 13.4 Max: 29 Tot: 104584
+       3 - 4        : 43
+       5 - 8        : 491
+       9 - 16       : 5997
+      17 - 32       : 1297
+       Total          7828      
+
+3. Global communication summary.
+   Messages: 8  Volume (words): 3440  Beta: 1.00
+   Default/Random bisection volumes: 1718/1718 [50%/50%]
+
+   (Note: All message sizes and communication volumes in this
+    section assume one degree of freedom. For a particular
+    simulation, multiply by the degrees of freedom to get the
+    actual number of words transferred during an assembly step.)
+
+3.1. Messages per subdomain.
+       Range          Count          Min: 2 Avg: 4.0 Max: 6 Tot: 16
+       2 - 2        : 1
+       3 - 4        : 2
+       5 - 8        : 1
+       Total          4         
+
+3.2. Communication volume (words) per subdomain.
+       Range          Count          Min: 864 Avg: 1720.0 Max: 2582 Tot: 6880
+     513 - 1024     : 1
+    1025 - 2048     : 2
+    2049 - 4096     : 1
+       Total          4         
+
+3.3. Message sizes (words).
+       Range          Count          Min: 401 Avg: 430.0 Max: 458 Tot: 3440
+     257 - 512      : 8
+       Total          8         
+
+3.4. Smallest average message size (words) per subdomain [subdomain 1].
+       Range          Count          Min: 401 Avg: 415.0 Max: 429 Tot: 1660
+     257 - 512      : 4
+       Total          4         
+
+3.5. Largest average message size (words) per subdomain [subdomain 0].
+       Range          Count          Min: 429 Avg: 443.5 Max: 458 Tot: 1774
+     257 - 512      : 4
+       Total          4         
+

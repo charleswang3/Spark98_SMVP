@@ -1,0 +1,104 @@
+1. Global mesh summary (../inputs/tiny.2.pack).
+   Nodes    :        75  Edges    :       330  Elements: 192
+   Interface:        15  Interface:        30
+   Interior :        60  Interior :       300
+
+   Dimensions: 3  Subdomains: 2  Nodes/elem: 4
+
+1.1. Node degrees.
+       Range          Count          Min: 3 Avg: 8.8 Max: 14 Tot: 660
+       3 - 4        : 2
+       5 - 8        : 34
+       9 - 16       : 39
+       Total          75        
+
+1.2. Nodes per subdomain.
+       Range          Count          Min: 45 Avg: 45.0 Max: 45 Tot: 90
+      33 - 64       : 2
+       Total          2         
+
+1.3. Interface nodes per subdomain.
+       Range          Count          Min: 15 Avg: 15.0 Max: 15 Tot: 30
+       9 - 16       : 2
+       Total          2         
+
+1.4. Elements per subdomain.
+       Range          Count          Min: 96 Avg: 96.0 Max: 96 Tot: 192
+      65 - 128      : 2
+       Total          2         
+
+1.5. Edges per subdomain.
+       Range          Count          Min: 180 Avg: 180.0 Max: 180 Tot: 360
+     129 - 256      : 2
+       Total          2         
+
+1.6. Interface edges per subdomain.
+       Range          Count          Min: 30 Avg: 30.0 Max: 30 Tot: 60
+      17 - 32       : 2
+       Total          2         
+
+2. Global matrix summary.
+   Nonzero matrix entries (symmetric): 405
+   Nonzero matrix entries (nonsymmetric): 735
+
+   (Note: Each matrix entry consists of dof*dof words, where dof
+    is the degrees of freedom in the simulation.)
+
+2.1. Nonzero matrix entries per subdomain (symmetric).
+       Range          Count          Min: 225 Avg: 225.0 Max: 225 Tot: 450
+     129 - 256      : 2
+       Total          2         
+
+2.2. Nonzero matrix entries per subdomain (nonsymmetric).
+       Range          Count          Min: 405 Avg: 405.0 Max: 405 Tot: 810
+     257 - 512      : 2
+       Total          2         
+
+2.3. Fewest average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 4 Avg: 9.0 Max: 15 Tot: 405
+       3 - 4        : 2
+       5 - 8        : 18
+       9 - 16       : 25
+       Total          45        
+
+2.4. Most average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 4 Avg: 9.0 Max: 15 Tot: 405
+       3 - 4        : 2
+       5 - 8        : 18
+       9 - 16       : 25
+       Total          45        
+
+3. Global communication summary.
+   Messages: 2  Volume (words): 30  Beta: 1.00
+   Default/Random bisection volumes: 30/30 [100%/100%]
+
+   (Note: All message sizes and communication volumes in this
+    section assume one degree of freedom. For a particular
+    simulation, multiply by the degrees of freedom to get the
+    actual number of words transferred during an assembly step.)
+
+3.1. Messages per subdomain.
+       Range          Count          Min: 2 Avg: 2.0 Max: 2 Tot: 4
+       2 - 2        : 2
+       Total          2         
+
+3.2. Communication volume (words) per subdomain.
+       Range          Count          Min: 30 Avg: 30.0 Max: 30 Tot: 60
+      17 - 32       : 2
+       Total          2         
+
+3.3. Message sizes (words).
+       Range          Count          Min: 15 Avg: 15.0 Max: 15 Tot: 30
+       9 - 16       : 2
+       Total          2         
+
+3.4. Smallest average message size (words) per subdomain [subdomain 0].
+       Range          Count          Min: 15 Avg: 15.0 Max: 15 Tot: 30
+       9 - 16       : 2
+       Total          2         
+
+3.5. Largest average message size (words) per subdomain [subdomain 0].
+       Range          Count          Min: 15 Avg: 15.0 Max: 15 Tot: 30
+       9 - 16       : 2
+       Total          2         
+

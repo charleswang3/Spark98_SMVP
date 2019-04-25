@@ -1,0 +1,121 @@
+1. Global mesh summary (../inputs/tiny.16.pack).
+   Nodes    :        75  Edges    :       330  Elements: 192
+   Interface:        60  Interface:       170
+   Interior :        15  Interior :       160
+
+   Dimensions: 3  Subdomains: 16  Nodes/elem: 4
+
+1.1. Node degrees.
+       Range          Count          Min: 3 Avg: 8.8 Max: 14 Tot: 660
+       3 - 4        : 2
+       5 - 8        : 34
+       9 - 16       : 39
+       Total          75        
+
+1.2. Nodes per subdomain.
+       Range          Count          Min: 12 Avg: 12.4 Max: 13 Tot: 199
+       9 - 16       : 16
+       Total          16        
+
+1.3. Interface nodes per subdomain.
+       Range          Count          Min: 9 Avg: 11.5 Max: 13 Tot: 184
+       9 - 16       : 16
+       Total          16        
+
+1.4. Elements per subdomain.
+       Range          Count          Min: 12 Avg: 12.0 Max: 12 Tot: 192
+       9 - 16       : 16
+       Total          16        
+
+1.5. Edges per subdomain.
+       Range          Count          Min: 33 Avg: 34.1 Max: 36 Tot: 545
+      33 - 64       : 16
+       Total          16        
+
+1.6. Interface edges per subdomain.
+       Range          Count          Min: 16 Avg: 24.1 Max: 33 Tot: 385
+       9 - 16       : 2
+      17 - 32       : 13
+      33 - 64       : 1
+       Total          16        
+
+2. Global matrix summary.
+   Nonzero matrix entries (symmetric): 405
+   Nonzero matrix entries (nonsymmetric): 735
+
+   (Note: Each matrix entry consists of dof*dof words, where dof
+    is the degrees of freedom in the simulation.)
+
+2.1. Nonzero matrix entries per subdomain (symmetric).
+       Range          Count          Min: 45 Avg: 46.5 Max: 49 Tot: 744
+      33 - 64       : 16
+       Total          16        
+
+2.2. Nonzero matrix entries per subdomain (nonsymmetric).
+       Range          Count          Min: 78 Avg: 80.6 Max: 85 Tot: 1289
+      65 - 128      : 16
+       Total          16        
+
+2.3. Fewest average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 4 Avg: 6.4 Max: 11 Tot: 83
+       3 - 4        : 3
+       5 - 8        : 8
+       9 - 16       : 2
+       Total          13        
+
+2.4. Most average entries per row (non-symmetric) [subdomain 1].
+       Range          Count          Min: 4 Avg: 6.7 Max: 10 Tot: 80
+       3 - 4        : 1
+       5 - 8        : 9
+       9 - 16       : 2
+       Total          12        
+
+3. Global communication summary.
+   Messages: 128  Volume (words): 458  Beta: 1.00
+   Default/Random bisection volumes: 108/252 [24%/55%]
+
+   (Note: All message sizes and communication volumes in this
+    section assume one degree of freedom. For a particular
+    simulation, multiply by the degrees of freedom to get the
+    actual number of words transferred during an assembly step.)
+
+3.1. Messages per subdomain.
+       Range          Count          Min: 10 Avg: 16.0 Max: 22 Tot: 256
+       9 - 16       : 10
+      17 - 32       : 6
+       Total          16        
+
+3.2. Communication volume (words) per subdomain.
+       Range          Count          Min: 7 Avg: 51.0 Max: 86 Tot: 816
+       5 - 8        : 2
+       9 - 16       : 0
+      17 - 32       : 0
+      33 - 64       : 10
+      65 - 128      : 4
+       Total          16        
+
+3.3. Message sizes (words).
+       Range          Count          Min: 1 Avg: 3.6 Max: 9 Tot: 458
+       1 - 1        : 20
+       2 - 2        : 28
+       3 - 4        : 40
+       5 - 8        : 38
+       9 - 16       : 2
+       Total          128       
+
+3.4. Smallest average message size (words) per subdomain [subdomain 13].
+       Range          Count          Min: 1 Avg: 2.9 Max: 7 Tot: 58
+       1 - 1        : 4
+       2 - 2        : 8
+       3 - 4        : 4
+       5 - 8        : 4
+       Total          20        
+
+3.5. Largest average message size (words) per subdomain [subdomain 11].
+       Range          Count          Min: 1 Avg: 4.0 Max: 6 Tot: 48
+       1 - 1        : 2
+       2 - 2        : 0
+       3 - 4        : 4
+       5 - 8        : 6
+       Total          12        
+

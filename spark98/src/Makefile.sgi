@@ -1,0 +1,25 @@
+#
+# SGI Power Challenge using SGI threads interface
+#
+CC = cc
+OPTIONS = -O2 -64
+
+all: smv lmv rmv mmv hmv
+
+smv: mv.c
+	$(CC) $(OPTIONS) -o smv mv.c
+
+lmv: mv.c
+	$(CC) $(OPTIONS) -DSGI_LOCK -o lmv mv.c
+
+rmv: mv.c
+	$(CC) $(OPTIONS) -DSGI_REDUCE -o rmv mv.c
+
+mmv: mmv.c
+	$(CC) $(OPTIONS) -o mmv mmv.c -lmpi
+
+hmv: hmv.c
+	$(CC) $(OPTIONS) -DSGI -o hmv hmv.c
+
+clean:
+	rm -f smv lmv rmv mmv hmv

@@ -1,0 +1,306 @@
+			       Spark98:
+		      Sparse Matrix Kernels for
+	      Shared Memory and Message Passing Systems
+
+			   David O'Hallaron
+
+		      School of Computer Science
+		      Carnegie Mellon University
+			 Pittsburgh, PA 15213
+			    January, 1998
+
+			email: droh@cs.cmu.edu
+		web: www.cs.cmu.edu/~quake/spark98.html
+
+
+Copyright (C) David O'Hallaron 1998. You are free to use this software
+without restriction. If you find that the suite is helpful to you, it
+would be very helpful if you sent me a note at droh@cs.cmu.edu letting
+me know how you are using it.
+
+--------------------------------------------------------------------
+1. Summary
+--------------------------------------------------------------------
+
+Spark98 is a collection of 10 sparse kernels for shared memory and
+message passing systems. The sparse matrices are induced from a pair
+of three-dimensional unstructured finite element simulations of
+earthquake ground motion in the San Fernando Valley.  The aim of
+Spark98 is to provide the systems community with examples of irregular
+codes that are realistic and yet are fairly small (about 1000 lines of
+code), and easy to use and experiment with.  Each kernel is a
+program/mesh pair.  There are 5 C programs (smv, lmv, rmv, mmv, hmv)
+and 2 finite element (sf10 and sf5), for a total of 10 kernels:
+
++---------------------------------------------------------+
+|		The Spark98 Kernels                       |
++------+------------------------+-------------------------+
+|prog  | sf10 (small mesh)      | sf5 (moderate mesh)     |
++------+------------------------+-------------------------+
+| smv  | sequential	     	| sequential	          |
+| lmv  | shared memory (lock)	| shared memory (lock)	  |	
+| rmv  | shared memory (reduce)	| shared memory (reduce)  |
+| mmv  | message passing (mpi) 	| message passing (mpi)   |
+| hmv  | hybrid                 | hybrid                  |
++------+------------------------+-------------------------+
+
+Smv is a baseline sequential program. Lmv and rmv are simple shared
+memory programs based on locks and reductions respectively.  Mmv is a
+parallel message passing program based on the MPI primitives, and hmv
+is a hybrid shared memory program written in an aggressive message
+passing style.  
+
+Each program computes a sequence of sparse matrix vector product
+(SMVP) pairs, y1=K1*x1 followed by y2=K2*x2, where K1 and K2 are
+sparse matrices with identical sparsity structures, and y1, y2, x1,
+and x2 are dense vectors.  Matrices are stored in compressed sparse
+row format and are block symmetric. Each nonzero matrix entry is a 3x3
+submatrix of doubles.  Only the diagonal and the upper triangle
+coefficients are actually stored. Similarly each vector entry is a 3x1
+subvector.
+
+Each matrix K is represented by three vectors: (1) the coefficient
+vector A, (2) Acol, which is defined s.t. A[i] is in column Acol[i], 
+and (3) Aindex, which is defined s.t. A[Aindex[i]] is the first
+nonzero entry of row i.
+
+The meshes determine both the size and nonzero structure of the sparse
+matrices used in the SMVP operations.  Both sf10 and sf5 are 3D
+unstructured finite element meshes developed by the CMU Quake project
+(www.cs.cmu.edu/~quake) to simulate earthquake-induced ground motion
+in the San Fernando Valley of Southern California.  Sf10 is
+small-sized mesh (7294 nodes, 97,138 nonzero matrix entries) and sf5
+is a moderate-sized mesh (30,169 nodes, 410,923 nonzero matrix
+entries).
+
+--------------------------------------------------------------------
+2. Programs
+--------------------------------------------------------------------
+
+For a particular mesh, each program computes an identical sequence of
+SMVP operations, but differs in how aggessively it partitions
+references among multiple threads. Each program is written in 
+ANSI C. 
+
+Smv is the baseline sequential program.
+
+Lmv is a parallel shared memory program based on locks. For each SMVP,
+there is a single copy of A, x, and y.  Each of t threads is allocated
+a chunk of contiguous rows of A so that each thread has roughly the
+same number of nonzeros.  Each thread updates y using L locks to
+synchronize the updates.  The program can be compiled for either the
+Posix threads (pthread) interface or the SGI thread interface. Lmv is
+extremely simple to parallelize, but can have poor performance,
+depending on the number of locks that are used. Generally, the more
+locks the better the performance, however, most systems limit the
+number of locks.
+
+Rmv is a parallel shared memory program based on reductions.  As with
+lmv, work is partitioned so that each thread gets roughly the same
+number of nonzero entries in the sparse matrix.  Similarly, for each
+SMVP, there is a single copy of A and x. However, unlike lmv, each
+thread updates its own private copy of y. These private vectors
+are then summed to produce the final output vector y. This is
+essentially the Fx Do&Merge model. The program can be compiled for
+either the pthread or SGI threads interface. Rmv is simple to program
+and generally performs better than lmv, at the cost of additional
+memory overhead in the form of the privatized output vectors.
+
+Mmv is a parallel message passing program written in MPI. Each
+processor updates local copies of A, x, and y. This is followed by a
+"full assembly" phase that combines the partially assembled output
+vectors.  The local copies of A, x, and y are induced from a partition
+that is computed off-line using a geometric recursive bisection
+partitioning algorithm due to Miller, Teng, Thurston, and Vivasis. Mmv
+is extremely aggressive in its partitioning of references and performs
+better than either lmv or rmv. But it is also much more difficult to
+program.
+
+Hmv is a hybrid shared memory/message passing program that
+aggressively partitions references like mmv, but uses shared memory to
+access and copy data. This is the most efficient (and hardest to
+program) shared memory version, with performance comparable to mmv.
+
+The spark98 programs are contained in the ./src directory:
+
+  Binary	Source	#define (define one of these)
+
+  smv		mv.c	<none>
+  lmv		mv.c	either PTHREAD_LOCK or SGI_LOCK
+  rmv     	mv.c	either PTHREAD_REDUCE or PTHREAD_REDUCE
+  mmv     	mmv.c	<none>
+  hmv     	hmv.c 	either SGI or PTHREAD
+
+Example makefiles for the DEC AlphaServer, the SGI Power Challenge and
+SGI Origin 2000, and the Cray T3E are provided in Makefile.dec,
+Makefile.sgi, and Makefile.t3e, repectively.
+
+--------------------------------------------------------------------
+3. Input files
+--------------------------------------------------------------------
+
+The input to a Spark98 kernel is a "packfile" that is generated by the
+Archimedes tool chain (see www.cs.cmu.edu/~quake/archimedes.html).  A
+packefile characterizes a finite element mesh, its partition into
+disjoint sets (subdomains) of elements, the nonzero structure of the
+sparse matrix induced by the partition in each subdomain, and the
+communication schedule for each subdomain. The input packfiles are
+contained in the ./inputs directory:
+
+  Packfile	Mesh nodes	Nonzero matrix entries
+
+  tiny.<s>.pack	    75 	  	735
+  sf10.<s>.pack	 7,294 	 	97,138
+  sf5.<s>.pack	30,169		410,923
+
+Each .<s>.pack is the packfile for a mesh that has been partitioned
+into s subdomains. Packfiles for s = 1, 2, 4, 8, 16, 32, 64, and 128
+subdomains are provided.
+
+Tiny is a small test case; It is not part of the Spark98 kernels. Sf10
+and sf5 are models of the San Fernando Valley in Southern California
+that were developed early in the Quake project.  Sf10 resolves seismic
+waves with 10 second periods; Sf5 resolves waves with 5 second
+periods.
+
+--------------------------------------------------------------------
+4. Sample output files 
+--------------------------------------------------------------------
+
+Each kernel that inputs the same dataset computes identical
+results. These results are contained in the following files in the 
+./outputs directory:
+
+  File		Description
+
+  sf10.out	Reference output for the sf10 packfiles
+  sf5.out	Reference output for the sf5 packfiles
+  tiny.out	Reference output for the tiny packfiles
+
+You can check correctness of your code using the -O flag. The results
+are printed as integers, thus results from two different runs can be
+compared reliably using diff. For example,
+
+  % lmv -t8 -O ../inputs/tiny.1.pack > stuff.out 
+  % diff stuff.out ../outputs/tiny.out
+
+--------------------------------------------------------------------
+5. Computational characteristics
+--------------------------------------------------------------------
+
+The ./info directory contains information about each partitioned mesh:
+
+  tiny.<s>.count
+  sf10.<s>.count
+  sf5.<s>.count
+
+Each .<s>.count file contains a wealth of statistical information
+about the corresponding .<s>.pack file, including the number of nodes,
+elements, and edges in the original mesh, the distribution of nodes,
+edges, elements, and nonzeros in each subdomain, the number of
+messages transferred by each subdomain, message sizes, and total
+communication volume.
+
+--------------------------------------------------------------------
+6. Documentation 
+--------------------------------------------------------------------
+
+The companion tech report that describes the Spark98 kernels
+in detail can be found in doc/cmu-cs-97-178.ps:
+
+D. O'Hallaron, "Spark98: Sparse matrix kernels for shared memory
+and message passsing systems", Tech. Rep. CMU-CS-97-178,
+School of Computer Science, Carnegie Mellon University, 1997. 
+(also available from www.cs.cmu.edu/~quake/papers.html).
+
+A complete characterization of the San Fernando meshes is contained in
+doc/cmu-cs-96-141.ps: 
+
+D. O'Hallaron and J. Shewchuk, "Properties of a Family of Parallel
+Finite Element Simulations", Tech. Rep. CMU-CS-96-141, School of
+Computer Science, Carnegie Mellon University, 1996.  (also available
+from www.cs.cmu.edu/~quake/papers.html).
+
+--------------------------------------------------------------------
+7. Compiling and running the kernels
+--------------------------------------------------------------------
+
+The programs are meant to run on many different machines, and thus are
+written in vanilla C with only basic Unix library calls. See the
+makefiles for examples of how to build the programs.
+
+Each program accepts a -h command line argument that provides 
+details about the other command line arguments. Example:
+
+  % smv -h
+
+Smv, lmv, and rmv must use packfiles that are partitioned into exactly
+1 subdomain. Example:
+
+  % lmv ../inputs/sf5.1.pack (correct)
+  % lmv ../inputs/sf5.4.pack (incorrect)
+
+Lmv and rmv can run with an arbitrary number of threads, which is
+specified on the command line. Example with 8 threads:
+
+  % rmv -t8 ../inputs/sf5.1.pack
+
+For mmv and hmv, the number of threads is determined by the number
+of subdomains in the packfile. Example with 8 threads:
+
+  % hmv ../inputs/sf5.8.pack
+
+The number of iterations is controlled with the -i flag:
+
+  % rmv -i10 ../inputs/sf5.1.pack
+
+The programs output some simple performance results on stderr:
+
+  % smv: packfile mflops secs mflops/secs
+
+mflops is millions of floating point operations for one SMVP.  secs is
+the time for one SMVP. mflops/secs is the usual MFLOPS rate. 
+
+  % lmv: packfile threads locks mflops secs mflops/sec [min/max/%]
+
+min (max) is the least (most) number of matrix nonzeros assigned to
+any thread. % is (min/max * 100). This is a sanity check to ensure
+that the computation is reasonably well load balanced.
+
+  % rmv: packfile threads locks mflops secs [comp/comm/%] 
+         mflops/secs [min/max/%]
+
+comm is the time spent reducing the vectors to a single vector.
+comp is the time spent doing everything else. % is (comp/secs)*100.
+ 
+  % mmv: packfile mflops secs [comp/comm/%] mflops/secs [min/max/%]
+  % hmv: packfile mflops secs [comp/comm/%] mflops/secs [min/max/%]
+
+comm is the time spent assembling the partially assembled output
+vectors. comp is the time spent doing everything else. % is
+(comp/secs)*100.
+
+--------------------------------------------------------------------
+8. Notes
+--------------------------------------------------------------------
+
+Note: Mmv and hmv perform slightly more flops than the other programs
+because of overlap on the boundaries of the partitions.  Unfortunately
+it isn't possible to recover at runtime the number of flops in the
+baseline sequential case from the information in the partitioned
+packfiles. Thus the reported Mflops/sec rates between smv/lmv/rmv and
+mmv/hmv are not exactly comparable; mmv and hmv will tend to slightly
+overstate their Mflops/sec rates relative to smv, lmv, and rmv.
+However, because the number of nodes on the boundaries of subdomains
+is small relative to the number of nodes in the interiors of
+subdomains, the Mflops/sec numbers are fine for rough qualitative
+comparisons.
+
+Note: If you need exactly comparable Mflops/sec rates for mmv and hmv,
+these can be computed by hand using the Mflops number reported by smv
+and the elapsed time reported by mmv or hmv.
+
+Note: The flops performed by rmv during its reduction are NOT counted,
+thus its reported Mflops/sec rates can be compared directly to those
+reported by smv and lmv.
+

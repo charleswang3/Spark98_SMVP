@@ -1,0 +1,127 @@
+1. Global mesh summary (sf5.16.pack).
+   Nodes    :     30169  Edges    :    190377  Elements: 151173
+   Interface:      4385  Interface:     12650
+   Interior :     25784  Interior :    177727
+
+   Dimensions: 3  Subdomains: 16  Nodes/elem: 4
+
+1.1. Node degrees.
+       Range          Count          Min: 4 Avg: 12.6 Max: 29 Tot: 380754
+       3 - 4        : 17
+       5 - 8        : 2284
+       9 - 16       : 24638
+      17 - 32       : 3230
+       Total          30169     
+
+1.2. Nodes per subdomain.
+       Range          Count          Min: 2081 Avg: 2182.2 Max: 2273 Tot: 34915
+    2049 - 4096     : 16
+       Total          16        
+
+1.3. Interface nodes per subdomain.
+       Range          Count          Min: 324 Avg: 570.7 Max: 767 Tot: 9131
+     257 - 512      : 5
+     513 - 1024     : 11
+       Total          16        
+
+1.4. Elements per subdomain.
+       Range          Count          Min: 9448 Avg: 9448.3 Max: 9449 Tot: 151173
+    8193 - 16384    : 16
+       Total          16        
+
+1.5. Edges per subdomain.
+       Range          Count          Min: 12423 Avg: 12710.9 Max: 12977 Tot: 203374
+    8193 - 16384    : 16
+       Total          16        
+
+1.6. Interface edges per subdomain.
+       Range          Count          Min: 889 Avg: 1602.9 Max: 2161 Tot: 25647
+     513 - 1024     : 1
+    1025 - 2048     : 13
+    2049 - 4096     : 2
+       Total          16        
+
+2. Global matrix summary.
+   Nonzero matrix entries (symmetric): 220546
+   Nonzero matrix entries (nonsymmetric): 410923
+
+   (Note: Each matrix entry consists of dof*dof words, where dof
+    is the degrees of freedom in the simulation.)
+
+2.1. Nonzero matrix entries per subdomain (symmetric).
+       Range          Count          Min: 14504 Avg: 14893.1 Max: 15250 Tot: 238289
+    8193 - 16384    : 16
+       Total          16        
+
+2.2. Nonzero matrix entries per subdomain (nonsymmetric).
+       Range          Count          Min: 26927 Avg: 27603.9 Max: 28227 Tot: 441663
+   16385 - 32768    : 16
+       Total          16        
+
+2.3. Fewest average entries per row (non-symmetric) [subdomain 3].
+       Range          Count          Min: 4 Avg: 12.4 Max: 26 Tot: 28227
+       3 - 4        : 50
+       5 - 8        : 304
+       9 - 16       : 1620
+      17 - 32       : 299
+       Total          2273      
+
+2.4. Most average entries per row (non-symmetric) [subdomain 0].
+       Range          Count          Min: 4 Avg: 12.9 Max: 24 Tot: 26927
+       3 - 4        : 29
+       5 - 8        : 177
+       9 - 16       : 1566
+      17 - 32       : 309
+       Total          2081      
+
+3. Global communication summary.
+   Messages: 90  Volume (words): 10264  Beta: 1.10
+   Default/Random bisection volumes: 1960/5578 [19%/54%]
+
+   (Note: All message sizes and communication volumes in this
+    section assume one degree of freedom. For a particular
+    simulation, multiply by the degrees of freedom to get the
+    actual number of words transferred during an assembly step.)
+
+3.1. Messages per subdomain.
+       Range          Count          Min: 4 Avg: 11.3 Max: 20 Tot: 180
+       3 - 4        : 1
+       5 - 8        : 5
+       9 - 16       : 7
+      17 - 32       : 3
+       Total          16        
+
+3.2. Communication volume (words) per subdomain.
+       Range          Count          Min: 676 Avg: 1283.0 Max: 1764 Tot: 20528
+     513 - 1024     : 4
+    1025 - 2048     : 12
+       Total          16        
+
+3.3. Message sizes (words).
+       Range          Count          Min: 3 Avg: 114.0 Max: 249 Tot: 10264
+       3 - 4        : 6
+       5 - 8        : 6
+       9 - 16       : 2
+      17 - 32       : 8
+      33 - 64       : 8
+      65 - 128      : 22
+     129 - 256      : 38
+       Total          90        
+
+3.4. Smallest average message size (words) per subdomain [subdomain 13].
+       Range          Count          Min: 3 Avg: 77.9 Max: 189 Tot: 1558
+       3 - 4        : 6
+       5 - 8        : 2
+       9 - 16       : 0
+      17 - 32       : 2
+      33 - 64       : 0
+      65 - 128      : 4
+     129 - 256      : 6
+       Total          20        
+
+3.5. Largest average message size (words) per subdomain [subdomain 6].
+       Range          Count          Min: 96 Avg: 169.0 Max: 242 Tot: 676
+      65 - 128      : 2
+     129 - 256      : 2
+       Total          4         
+
