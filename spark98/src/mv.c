@@ -22,7 +22,7 @@
 #include <sys/time.h>
 #include <string.h>
 
-#if (defined(PTHREAD_LOCK) || defined(PTHREAD_REDUCE))
+#if (defined(PTHREAD_LOCK) || defined(PTHREAD_REDUCE) || defined(SCHEDULE))
 #define PTHREAD
 #elif (defined(SGI_LOCK) || defined(SGI_REDUCE))
 #define SGI
@@ -179,17 +179,33 @@ void init_etime(void);
 double get_etime(void);
 
 /* system dependent thread routines */
-#if (defined(LOCK) || defined(REDUCE))
+#if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
 void spark_init_threads(void);
 void spark_start_threads(int n);
 void spark_barrier(void);
 void spark_setlock(int lockid);
 void spark_unsetlock(int lockid);
 #endif
+#if defined(SCHEDULE)
+    double (***schedule) [3][3];
+    int **schedule_row;
+    int *schedule_len;
+#endif
 
 /*
  * main program
  */
+
+int find_partition_ind(int i)
+{
+    int j;
+    for (j = 0; j < gip->threads - 1; j++)
+    {
+        if (i >= firstrow[j] && i < firstrow[j + 1])
+            return i;
+    }
+    return gip->threads - 1;
+}
 void main(int argc, char **argv) {
 
   int i;
@@ -285,11 +301,46 @@ void main(int argc, char **argv) {
     }
   }
   firstrow[gip->threads] = gip->nodes;
+    
+  //Allocate and determine schedules
+#if defined(SCHEDULE)
+    double (**type1) [3][3];
+    double (*type2) [3][3];
+    schedule = calloc(gip->threads, sizeof(type1));
+    schedule_row = calloc(gip->threads, sizeof(int*));
+    schedule_len = calloc(gip->threads, sizeof(int));
+    for (i = 0; i < gip->threads; i++)
+    {
+        schedule[i] = calloc(nonzeros, sizeof(type2));
+        schedule_row[i] = calloc(nonzeros, sizeof(int));
+    }
+    int r;
+    //Fill in schedule
+    for (r = 0; r < 30169; r++)
+    {
+        int rowstart = gip->matrixindex[r];
+        for (i = rowstart; i < gip->matrixindex[r + 1]; i++)
+        {
+            double (*elem) [3][3] = &K1[i];
+            int j = gip->matrixcol[i];
+            int p1 = find_partition_ind(i);
+            schedule[p1][schedule_len[p1]] = elem;
+            schedule_row[p1][schedule_len[p1]] = r;
+            schedule_len[p1]++;
 
-  /*
-   * start the workers
+            int p2 = find_partition_ind(j);
+            schedule[p2][schedule_len[p2]] = elem;
+            schedule_row[p2][schedule_len[p2]] = r;
+            schedule_len[p2]++;
+        }
+    }
+
+#endif
+
+/*
+ * start the workers
    */
-#if (defined(LOCK) || defined(REDUCE))
+#if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
   spark_start_threads(gip->threads-1);
 #endif
 
@@ -300,7 +351,7 @@ void main(int argc, char **argv) {
 #if defined(LOCK)
       fprintf(stderr, "%s: Performing %d SMVP pairs (n=%d) with %d threads and %d locks.",
 	      gip->progname, gip->iters, gip->nodes, gip->threads, gip->locks);
-#elif defined(REDUCE)
+#elif (defined(REDUCE) || defined(SCHEDULE))
       fprintf(stderr, "%s: Performing %d SMVP pairs (n=%d) with %d threads.",
 	      gip->progname, gip->iters, gip->nodes, gip->threads);
 #else
@@ -357,6 +408,12 @@ void main(int argc, char **argv) {
 	  ((secs-csecs)/secs)*100.0, mflops/secs, minnonzeros, maxnonzeros,
 	  (double)((double)minnonzeros/(double)maxnonzeros)*100.0);
 
+#elif defined(SCHEDULE)
+fprintf(stderr,
+	  "%s: %s %d threads %.6f Mf %.6f s %.1f Mf/s [%d/%d/%.0f%%]\n",
+	  gip->progname, gip->packfilename, gip->threads, mflops, secs, mflops/secs, minnonzeros, maxnonzeros,
+	  (double)((double)minnonzeros/(double)maxnonzeros)*100.0);
+
 #else
   /* baseline sequential SMVP */
   fprintf(stderr, "%s: %s %.6f Mf %.6f s %.1f Mf/s\n",
@@ -403,7 +460,7 @@ void init(int argc, char **argv, struct gi *gip) {
     exit(0);
   }
 
-#if (defined(LOCK) || defined(REDUCE))
+#if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
   spark_init_threads();
 #endif
 
@@ -418,7 +475,7 @@ void *smvpthread(void *a) {
   int id = *argp;
   double mycsecs, mystarttime, mystartctime;
 
-#if (defined(LOCK) || defined(REDUCE))
+#if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
   int numrows = firstrow[id+1] - firstrow[id];
   spark_barrier();
 #endif
@@ -467,6 +524,21 @@ void *smvpthread(void *a) {
     spark_barrier();
     add_vectors(tmpw, w2, firstrow[id], numrows, gip);
     mycsecs += (get_etime() - mystartctime);
+#elif defined(SCHEDULE)
+    /* w1 = K1*v1 */
+    spark_barrier();
+    zero_vector(w1, firstrow[id], numrows);
+    spark_barrier();
+    local_smvp(gip->nodes, K1, gip->matrixcol, gip->matrixindex,
+	       v1, w1, firstrow[id], numrows, id, gip);
+
+    /* w2 = K2*v2 */
+    spark_barrier();
+    zero_vector(w2, firstrow[id], numrows);
+    spark_barrier();
+    local_smvp(gip->nodes, K2, gip->matrixcol, gip->matrixindex,
+	       v2, w2, firstrow[id], numrows, id, gip);
+
 
 #else /* sequential */
 
@@ -591,6 +663,31 @@ void local_smvp(int nodes, double (*A)[DOF][DOF], int *Acol,
   int Anext, Alast, col;
   double sum0, sum1, sum2;
 
+
+
+#if defined(SCHEDULE)
+    for (i = 0; i < schedule_len[id]; i++)
+    {
+        double elem[3][3];
+        int i1, i2;
+        for (i1 = 0; i1 < 3; i1++)
+        {
+            for (i2 = 0; i2 < 3; i2++)
+            {
+                elem[i1][i2] = (*schedule[id][i])[i1][i2];
+            }
+        }
+        int r = schedule_row[id][i];
+
+        sum0 = elem[0][0]*v[r][0] + elem[0][1]*v[r][1] + elem[0][2]*v[r][2];
+        sum1 = elem[1][0]*v[r][0] + elem[1][1]*v[r][1] + elem[1][2]*v[r][2];
+        sum2 = elem[2][0]*v[r][0] + elem[2][1]*v[r][1] + elem[2][2]*v[r][2];
+        
+        w[r][0] += sum0;
+        w[r][1] += sum1;
+        w[r][2] += sum2;
+    }
+#else
 #if defined(LOCK)
   int lockid;
 #endif
@@ -640,6 +737,7 @@ void local_smvp(int nodes, double (*A)[DOF][DOF], int *Acol,
     spark_unsetlock(lockid);
 #endif
   }
+#endif
 }
 
 /*
