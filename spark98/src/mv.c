@@ -187,7 +187,7 @@ void spark_setlock(int lockid);
 void spark_unsetlock(int lockid);
 #endif
 #if defined(SCHEDULE)
-    double (***schedule) [3][3];
+    int **schedule;
     int **schedule_row;
     int *schedule_len;
 #endif
@@ -304,15 +304,17 @@ void main(int argc, char **argv) {
     
   //Allocate and determine schedules
 #if defined(SCHEDULE)
+
+    //printf("BEFORE SCHEDULE PROCESSING \n");
     double (**type1) [3][3];
     double (*type2) [3][3];
-    schedule = calloc(gip->threads, sizeof(type1));
+    schedule = calloc(gip->threads, sizeof(int**));
     schedule_row = calloc(gip->threads, sizeof(int*));
     schedule_len = calloc(gip->threads, sizeof(int));
     for (i = 0; i < gip->threads; i++)
     {
-        schedule[i] = calloc(nonzeros, sizeof(type2));
-        schedule_row[i] = calloc(nonzeros, sizeof(int));
+        schedule[i] = calloc(gip->matrixlen, sizeof(int*));
+        schedule_row[i] = calloc(gip->matrixlen, sizeof(int));
     }
     int r;
     //Fill in schedule
@@ -321,25 +323,25 @@ void main(int argc, char **argv) {
         int rowstart = gip->matrixindex[r];
         for (i = rowstart; i < gip->matrixindex[r + 1]; i++)
         {
-            double (*elem) [3][3] = &K1[i];
+            int elem = i;
             int j = gip->matrixcol[i];
             int p1 = find_partition_ind(i);
             schedule[p1][schedule_len[p1]] = elem;
             schedule_row[p1][schedule_len[p1]] = r;
             schedule_len[p1]++;
-
             int p2 = find_partition_ind(j);
             schedule[p2][schedule_len[p2]] = elem;
             schedule_row[p2][schedule_len[p2]] = r;
             schedule_len[p2]++;
         }
     }
+    //printf("After SChedule PROCESSING\n");
 
 #endif
 
-/*
- * start the workers
-   */
+    /*
+     * start the workers
+     */
 #if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
   spark_start_threads(gip->threads-1);
 #endif
@@ -664,19 +666,27 @@ void local_smvp(int nodes, double (*A)[DOF][DOF], int *Acol,
   double sum0, sum1, sum2;
 
 
-
 #if defined(SCHEDULE)
     for (i = 0; i < schedule_len[id]; i++)
     {
+
         double elem[3][3];
+        //printf("id = %d, i = %d \n", id, i);
+        
         int i1, i2;
         for (i1 = 0; i1 < 3; i1++)
         {
             for (i2 = 0; i2 < 3; i2++)
             {
-                elem[i1][i2] = (*schedule[id][i])[i1][i2];
+                //printf("i1 = %d, i2 = %d \n", i1, i2);
+                //printf("%p \n", schedule[id][i]);
+                
+                elem[i1][i2] = (A[schedule[id][i]])[i1][i2];
+                //printf("i1 = %d, i2 = %d \n", i1, i2);
+
             }
         }
+        //printf("Segfault before \n");
         int r = schedule_row[id][i];
 
         sum0 = elem[0][0]*v[r][0] + elem[0][1]*v[r][1] + elem[0][2]*v[r][2];
