@@ -201,8 +201,8 @@ int find_partition_ind(int i)
     int j;
     for (j = 0; j < gip->threads - 1; j++)
     {
-        if (i >= firstrow[j] && i < firstrow[j + 1])
-            return i;
+        if (i >= gip->matrixindex[firstrow[j]] && i < gip->matrixindex[firstrow[j + 1]])
+            return j;
     }
     return gip->threads - 1;
 }
@@ -306,15 +306,13 @@ void main(int argc, char **argv) {
 #if defined(SCHEDULE)
 
     //printf("BEFORE SCHEDULE PROCESSING \n");
-    double (**type1) [3][3];
-    double (*type2) [3][3];
     schedule = calloc(gip->threads, sizeof(int**));
-    schedule_row = calloc(gip->threads, sizeof(int*));
+    schedule_row = calloc(gip->threads, sizeof(int**));
     schedule_len = calloc(gip->threads, sizeof(int));
     for (i = 0; i < gip->threads; i++)
     {
         schedule[i] = calloc(gip->matrixlen, sizeof(int*));
-        schedule_row[i] = calloc(gip->matrixlen, sizeof(int));
+        schedule_row[i] = calloc(gip->matrixlen, sizeof(int*));
     }
     int r;
     //Fill in schedule
@@ -331,7 +329,7 @@ void main(int argc, char **argv) {
             schedule_len[p1]++;
             int p2 = find_partition_ind(j);
             schedule[p2][schedule_len[p2]] = elem;
-            schedule_row[p2][schedule_len[p2]] = r;
+            schedule_row[p2][schedule_len[p2]] = j;
             schedule_len[p2]++;
         }
     }
