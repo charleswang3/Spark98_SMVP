@@ -316,7 +316,7 @@ void main(int argc, char **argv) {
     }
     int r;
     //Fill in schedule
-    for (r = 0; r < 30169; r++)
+    for (r = 0; r < gip->nodes; r++)
     {
         int rowstart = gip->matrixindex[r];
         for (i = rowstart; i < gip->matrixindex[r + 1]; i++)
