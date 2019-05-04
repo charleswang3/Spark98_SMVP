@@ -799,7 +799,7 @@ void parsecommandline(int argc, char **argv, struct gi *gip) {
 	  exit(0);
 	}
       }
-#if (defined(LOCK) || defined(REDUCE))
+#if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
       else if (argv[i][1] == 't') {
 	gip->threads = atoi(&argv[i][2]);
 	if (gip->threads <= 0) {
