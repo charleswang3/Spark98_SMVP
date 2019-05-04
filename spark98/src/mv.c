@@ -301,7 +301,7 @@ void main(int argc, char **argv) {
     }
   }
   firstrow[gip->threads] = gip->nodes;
-    
+
   //Allocate and determine schedules
 #if defined(SCHEDULE)
 
@@ -560,7 +560,7 @@ void *smvpthread(void *a) {
     csecs = mycsecs / (2.0 * gip->iters);
   }
 
-#if (defined(LOCK) || defined(REDUCE))
+#if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
   spark_barrier();
 #endif
 
@@ -670,27 +670,16 @@ void local_smvp(int nodes, double (*A)[DOF][DOF], int *Acol,
 
         double elem[3][3];
         //printf("id = %d, i = %d \n", id, i);
-        
-        int i1, i2;
-        for (i1 = 0; i1 < 3; i1++)
-        {
-            for (i2 = 0; i2 < 3; i2++)
-            {
-                //printf("i1 = %d, i2 = %d \n", i1, i2);
-                //printf("%p \n", schedule[id][i]);
-                
-                elem[i1][i2] = (A[schedule[id][i]])[i1][i2];
-                //printf("i1 = %d, i2 = %d \n", i1, i2);
 
-            }
-        }
+        //printf("i1 = %d, i2 = %d \n", i1, i2);
+
         //printf("Segfault before \n");
         int r = schedule_row[id][i];
 
-        sum0 = elem[0][0]*v[r][0] + elem[0][1]*v[r][1] + elem[0][2]*v[r][2];
-        sum1 = elem[1][0]*v[r][0] + elem[1][1]*v[r][1] + elem[1][2]*v[r][2];
-        sum2 = elem[2][0]*v[r][0] + elem[2][1]*v[r][1] + elem[2][2]*v[r][2];
-        
+        sum0 = A[schedule[id][i]][0][0]*v[r][0] + (A[schedule[id][i]])[0][1]*v[r][1] + (A[schedule[id][i]])[0][2]*v[r][2];
+        sum1 = (A[schedule[id][i]])[1][0]*v[r][0] + (A[schedule[id][i]])[1][1]*v[r][1] + (A[schedule[id][i]])[1][2]*v[r][2];
+        sum2 = (A[schedule[id][i]])[2][0]*v[r][0] + (A[schedule[id][i]])[2][1]*v[r][1] + (A[schedule[id][i]])[2][2]*v[r][2];
+
         w[r][0] += sum0;
         w[r][1] += sum1;
         w[r][2] += sum2;
