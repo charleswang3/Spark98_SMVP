@@ -380,7 +380,7 @@ void main(int argc, char **argv) {
     double begin = get_wall_time();
     smvpthread(&ids[0]);
     double end = get_wall_time();
-    secs = end - begin;
+    secs = (end - begin)/(2.0*gip->iters);
   /* compute min and max load on each thread */
   minnonzeros = ~(1<<31);
   maxnonzeros = -1;
