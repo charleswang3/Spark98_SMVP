@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
+#include <time.h>
 
 #if (defined(PTHREAD_LOCK) || defined(PTHREAD_REDUCE) || defined(SCHEDULE))
 #define PTHREAD
@@ -192,6 +193,16 @@ void spark_unsetlock(int lockid);
     int *schedule_len;
 #endif
 
+double get_wall_time(){
+    struct timeval time;
+    if (gettimeofday(&time,NULL)){
+    return 0;
+    }
+    return (double)time.tv_sec + (double)time.tv_usec * 1e-6;
+
+
+}
+
 /*
  * main program
  */
@@ -341,7 +352,7 @@ void main(int argc, char **argv) {
      * start the workers
      */
 #if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
-  spark_start_threads(gip->threads-1);
+    spark_start_threads(gip->threads-1);
 #endif
 
   /*
@@ -360,30 +371,18 @@ void main(int argc, char **argv) {
 #endif
   }
   ids[0] = 0;
-  smvpthread(&ids[0]);
-
-  if (!gip->quiet) {
-    fprintf(stderr, " Done.\n");
-    fflush(stderr);
-  }
-
-  if (secs == 0.0) {
-    fprintf(stderr, "error: no measured elapsed time. Use more iterations (e.g., -i%d)\n",
-	    gip->iters*10);
-    exit(0);
-  }
-
-  /*
-   * summarize performance
-   */
-  mflops =
+    mflops =
     (double)((2.0*gip->matrixlen - gip->nodes) *   /* nonzero blocks */
      DOF*DOF *                                     /* DOF^2 numbers/block */
      2.0)                                          /* 2 flops/block */
      / 1000000.0;
 
+    double begin = get_wall_time();
+    smvpthread(&ids[0]);
+    double end = get_wall_time();
+    secs = end - begin;
   /* compute min and max load on each thread */
-  minnonzeros = 1<<20;
+  minnonzeros = ~(1<<31);
   maxnonzeros = -1;
   for (i=0; i<gip->threads; i++) {
     nonzeros = gip->matrixindex[firstrow[i+1]] - gip->matrixindex[firstrow[i]];
@@ -419,6 +418,22 @@ fprintf(stderr,
   fprintf(stderr, "%s: %s %.6f Mf %.6f s %.1f Mf/s\n",
 	  gip->progname, gip->packfilename, mflops, secs, mflops/secs);
 #endif
+  if (!gip->quiet) {
+    fprintf(stderr, " Done.\n");
+    fflush(stderr);
+  }
+
+  if (secs == 0.0) {
+    fprintf(stderr, "error: no measured elapsed time. Use more iterations (e.g., -i%d)\n",
+	    gip->iters*10);
+    exit(0);
+  }
+
+  /*
+   * summarize performance
+   */
+
+
 
   /* print results */
   if (gip->output) {
@@ -480,8 +495,8 @@ void *smvpthread(void *a) {
   spark_barrier();
 #endif
 
-  mycsecs = 0.0;
-  mystarttime = get_etime();
+  //mycsecs = 0.0;
+  //mystarttime = get_etime();
 
   for (i=0; i<gip->iters; i++) {
 
@@ -528,14 +543,14 @@ void *smvpthread(void *a) {
     /* w1 = K1*v1 */
     spark_barrier();
     zero_vector(w1, firstrow[id], numrows);
-    spark_barrier();
+    //spark_barrier();
     local_smvp(gip->nodes, K1, gip->matrixcol, gip->matrixindex,
 	       v1, w1, firstrow[id], numrows, id, gip);
 
     /* w2 = K2*v2 */
-    spark_barrier();
+    //spark_barrier();
     zero_vector(w2, firstrow[id], numrows);
-    spark_barrier();
+    //spark_barrier();
     local_smvp(gip->nodes, K2, gip->matrixcol, gip->matrixindex,
 	       v2, w2, firstrow[id], numrows, id, gip);
 
@@ -556,8 +571,8 @@ void *smvpthread(void *a) {
   }
 
   if (id == 0) {
-    secs = (get_etime() - mystarttime)/(2.0*gip->iters);
-    csecs = mycsecs / (2.0 * gip->iters);
+    //secs = (get_etime() - mystarttime)/(2.0*gip->iters);
+    //csecs = mycsecs / (2.0 * gip->iters);
   }
 
 #if (defined(LOCK) || defined(REDUCE) || defined(SCHEDULE))
